@@ -1,0 +1,29 @@
+@media screen and (min-width: 992px) {
+	#original {
+		position: absolute;
+		bottom: 0;
+		right: 2px;
+		font-family: "Comic Sans MS", cursive, sans-serif;
+		font-size: 20px; 
+		color: red;
+	}
+
+	body{
+    	background-image: url(omfgdogs.gif);
+    	background-repeat: repeat;
+	}
+
+	#message {
+		visibility: hidden;
+	}
+}
+
+@media screen and (max-width: 992px) {
+	#original {
+		visibility: hidden;
+	}
+}
+
+
+
+
