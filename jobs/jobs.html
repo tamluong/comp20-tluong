@@ -17,25 +17,17 @@
 		contacts = JSON.parse(str);
 		for (i=0; i<contacts.length; i++) {
 			var job = contacts[i];
-			//console.log(job);
-			var key;
-			/*for (key in job) {
-				if (key == 'position') {position = job[key]; break;}
-				if (key == 'company') {company = job[key]; break;}
-				if (key == 'location') {location = job[key]; break;}
-			}
-			//console.log(company, position, location);*/
 			position = job['position'];
 			company = job['company'];
 			loc = job['location'];
-			console.log(company);
-			console.log(position);
-			console.log(loc);
 			var jobList = document.getElementById("list");
 			var para = document.createElement("p");
-			para.innerHTML = "Company: " + company + "</br>" + 
-							 "Position: " + position + "</br>" +
-							 "Location: " + loc;
+			para.innerHTML = "<span class='info'>Company: </span>" +
+							 company + "</br>" + 
+							 "<span class='info'>Position: </span>" +
+							 position + "</br>" +
+							 "<span class='info'>Location: </span>" +
+							 loc;
 			jobList.appendChild(para); 
 		}
 	}

@@ -1,5 +1,25 @@
+body {
+	font-family: 'Century Gothic', 'Tangerine', serif;
+	font-size: 20px;
+	border: 2px solid green;
+}
+
 p {
-	border: 1px solid green;
+	
 	padding: 2px;
+	text-align: left;
+	float: center;
+	clear: both;
+	background-color: cyan;
+	vertical-align: 20px;
+}
+
+h1, h2 {
 	text-align: center;
+	font-family: 'Century Gothic', 'Tangerine', serif;
+	color: red;
+}
+
+.info {
+	font-weight: bold;
 }
