@@ -194,8 +194,8 @@ function drawPolyline() {
     var polyline = new google.maps.Polyline({
         path: polylineCoords,
         geodesign: true,
-        stokeColor: polylineColor,
-        stokeWeight: 5
+        strokeColor: polylineColor,
+        strokeWeight: 3
     })
     polyline.setMap(map);
 }
