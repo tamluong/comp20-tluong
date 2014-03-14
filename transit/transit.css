@@ -12,3 +12,18 @@ body {
 	height: 100%;
 	width: 100%;
 }
+
+#eureka, #tableName {
+	font-weight: bold;
+	font-size: 15px;
+}
+
+table, td, th {
+	border:1px solid green;
+}
+
+th {
+	background-color:green;
+	color:white;
+}
+
