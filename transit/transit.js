@@ -43,11 +43,6 @@ function initStations() {
     stations = JSON.parse(stations_str);
 }
 
-//function createMarker(marker) {
-//    marker.setMap(map);
-//}
-
-
 function getMyLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -75,20 +70,10 @@ function renderMap() {
     xhr.open("get","http://mbtamap.herokuapp.com/mapper/rodeo.json",true);
     xhr.onreadystatechange = dataReady;
     xhr.send(null);
-    
-    //infowindow = new google.maps.InfoWindow();
-    
-    // Open info window on click of marker
-    //google.maps.event.addListener(marker, 'click', function() {
-    //                              infowindow.setContent(marker.title);
-    //                              infowindow.open(map, marker);
-    //                              });
-
 }
 
 function dataReady() {
     if (xhr.readyState == 4 && xhr.status == 200) {
-        console.log("Yo! I got some response!");
         renderGraphics();
     }
     else if (xhr.readyState == 4 && xhr.status == 500) {
@@ -104,7 +89,6 @@ function renderGraphics() {
     data = JSON.parse(xhr.responseText);
     
     lineColor = data["line"];
-    console.log(lineColor);
     
     //looping through the stations in the list
     stations.forEach(function(station){
@@ -190,7 +174,6 @@ function drawPolyline() {
     else if (lineColor == "blue") {
         polylineColor = '#0000FF';
     }
-    console.log(polylineColor);
     var polyline = new google.maps.Polyline({
         path: polylineCoords,
         geodesign: true,
