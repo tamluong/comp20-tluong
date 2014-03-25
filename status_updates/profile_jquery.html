@@ -12,11 +12,7 @@ var count = 0;
 
 $(document).ready(function() {
 	count = localStorage.length;
-
-	console.log(count);
-
 	for (i=1; i<=count; i++) {
-		console.log(localStorage[i]);
 		var text = document.createElement("p");
 		text.innerHTML = localStorage[i];
 		var status = document.getElementById("status");
@@ -28,7 +24,7 @@ $(document).ready(function() {
 	console.log(event.keyCode);
 });*/
 
-$("input#msg").click(function() {
+$("input#msg").change(function() {
 	//var msg = document.getElementById("msg");
 	console.log("hey!");
 	//console.log( $(this).text() );
@@ -71,6 +67,8 @@ $("input#msg").click(function() {
 	</div>
 	<h2 id="fullname">Barney Gumble</h2>
 	<h3>What are you thinking about? <input type="text" id="msg" name="msg" size="30"/></h3>
+
+
 	<h3>Updates</h3>
 
 	<div id="status">
@@ -91,5 +89,33 @@ $("input#msg").click(function() {
 			<li>Steven is now connected to James</li>
 		</ul>
 	</div>
+<script>
+	$("input#msg").change(function() {
+	//var msg = document.getElementById("msg");
+	//console.log("hey!");
+	//console.log( $(this).val() );
+	var text = document.createElement("p");
+	var currentTime = new Date();
+	var month = currentTime.getMonth() + 1;
+	var day = currentTime.getDate();
+	var year = currentTime.getFullYear();
+	var hour = currentTime.getHours();
+	var minute = currentTime.getMinutes();
+	text.innerHTML = month + "/" + day + "/" + year + " " + hour + ":" + minute + " - " + $(this).val();
+	var status = document.getElementById("status");
+	status.insertBefore(text,status.childNodes[0]);
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
