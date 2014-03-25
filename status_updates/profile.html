@@ -12,11 +12,7 @@ var count = 0;
 
 $(document).ready(function() {
 	count = localStorage.length;
-
-	console.log(count);
-
 	for (i=1; i<=count; i++) {
-		console.log(localStorage[i]);
 		var text = document.createElement("p");
 		text.innerHTML = localStorage[i];
 		var status = document.getElementById("status");
@@ -24,38 +20,9 @@ $(document).ready(function() {
 	}
 });
 
-/*$(document).on("keydown",function(event) {
-	console.log(event.keyCode);
-});*/
-
-$("input#msg").click(function() {
-	//var msg = document.getElementById("msg");
-	console.log("hey!");
-	//console.log( $(this).text() );
-	var text = document.createElement("p");
-	var currentTime = new Date();
-	var month = currentTime.getMonth() + 1;
-	var day = currentTime.getDate();
-	var year = currentTime.getFullYear();
-	var hour = currentTime.getHours();
-	var minute = currentTime.getMinutes();
-	//text.innerHTML = month + "/" + day + "/" + year + " " + hour + ":" + minute + " - " + this.value;
-	//var status = document.getElementById("status");
-	//status.insertBefore(text,status.childNodes[0]);
-});
-
-/*document.addEventListener("keydown", function(event) {
-    console.log(event.keyCode);
-    if (event.keyCode == 32) {
-      console.log("I see that you pressed the space bar!");
-    }
-  });*/
-
 function writeStatus() {
 	count ++;
 	var msg = document.getElementById("msg");
-	//console.log("hey!");
-	//console.log( $(this).text() );
 	var text = document.createElement("p");
 	var currentTime = new Date();
 	var month = currentTime.getMonth() + 1;
