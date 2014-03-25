@@ -51,25 +51,6 @@ $("input#msg").click(function() {
     }
   });*/
 
-function writeStatus() {
-	count ++;
-	var msg = document.getElementById("msg");
-	//console.log("hey!");
-	//console.log( $(this).text() );
-	var text = document.createElement("p");
-	var currentTime = new Date();
-	var month = currentTime.getMonth() + 1;
-	var day = currentTime.getDate();
-	var year = currentTime.getFullYear();
-	var hour = currentTime.getHours();
-	var minute = currentTime.getMinutes();
-	var msgtext = month + "/" + day + "/" + year + " " + hour + ":" + minute + " - " + msg.value;
-	text.innerHTML = msgtext;
-	var status = document.getElementById("status");
-	status.insertBefore(text,status.childNodes[0]);
-	console.log(count);
-	localStorage.setItem(count, msgtext);
-};
 </script>
 
 
@@ -89,7 +70,7 @@ function writeStatus() {
 		</ul>
 	</div>
 	<h2 id="fullname">Barney Gumble</h2>
-	<h3>What are you thinking about? <input type="text" id="msg" name="msg" size="30" onchange="writeStatus()"/></h3>
+	<h3>What are you thinking about? <input type="text" id="msg" name="msg" size="30"/></h3>
 	<h3>Updates</h3>
 
 	<div id="status">
