@@ -34,7 +34,6 @@ function writeStatus() {
 	text.innerHTML = msgtext;
 	var status = document.getElementById("status");
 	status.insertBefore(text,status.childNodes[0]);
-	console.log(count);
 	localStorage.setItem(count, msgtext);
 };
 </script>
