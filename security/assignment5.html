@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tam Luong - Security Assessment</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css"></link>
+</head>
+
+<body>
+<h1>Assignment 5 - Security Assessment of ScoreCenter</h1>
+
+<p>By: <a href="http://tamluong.github.io">Tam Luong</a></p>
+
+<h2>Introduction</h2>
+
+<p>This security assessment tests the vulnerability of the ScoreCenter web application developed by <a href="http://jgx.github.io/">Jonathan Gilad</a> for <a href="http://tuftsdev.github.io/WebProgramming/assignments/a5.html">Comp20 Assignment 5</a>. Gilad's ScoreCenter allows users to keep track of their scores and grid every time they play the game 2048. This is achieved by providing an API (through the web application) for users to send in their game's information (score, grid and timestamp) and retrieve them on the website through the simple user interface. This web user interface allows any user to see the entire database or to see game information of a specific user through a simple username request. Although this web application is functional, it contains a lot of security issues that make it unsuitable for public use. This assessment will identify and analyze the security issues, as well as suggest some solutions for them.</p>
+
+<h2>Methodology</h2>
+
+<p>At first, assessment was "black-box" testing. I tried to use curl and simple tools like Tamper Data on Firefox to find out my partner's site vulnerabilities. After that, I met up with my partner and we exchanged our codes. I then reviewed through the code by running it in localhost to find more logic errors, bad programming practices and also vulnerabilities that can potentially be exploited.</p>
+
+<h2>Abstract of Findings</h2>
+
+<p>The majority of the issues found within this security assessment pertains to the ability of the web application to filter out the bad inputs. Also, there is currently no limit of the input that the web application takes in. My analysis will hence be mostly focusing the input filtering and some coding glitches. </p>
+
+<h2>Issues found and technical analysis</h2>
+
+<ol>
+<li><p><strong>Cross-Site Scripting:</strong></p>
+
+<ul>
+<li><strong>Issue: </strong> user can manually inject <code>&lt;script&gt;</code> elements into the database, which will displayed erroneous results on the web page when loaded. </li>
+
+<li><strong>Location: </strong><code>&lt;script&gt;</code> is passed in through the POST API.</li>
+
+<li><strong>Severity of issue: </strong> <span class="high">High</span>, this makes the site vulnerable to an array of JavaScript codes, which can alter the site appearance and render the site unusable by users.</li> 
+
+<li><strong>Description: </strong> Data submitted is not properly checked so that it can contain JavaScript codes that can affect the web site directly. For example, from the Mac shell command, running: <code> curl --data "username=&lt;iframe width="560" height="315" src="http://www.youtube.com/embed/E2LM3ZlcDnkder="0" allowfullscreen&gt;&lt;/iframe&gt;" http://thawing-dawn-4700.herokuapp.com/submit.json </code> will embed a youtube video inside the web site when loaded.
+<table class="pictures">
+<tr><td><img src="images/Issue 1_command line.png" alt="command line" title="Cross Site Scripting attack curl command" /></td>
+<td><img src="images/Issue 1_result.png" alt="result" title="Cross Site Scripting attack result" /></td></tr></table></li>
+
+<li><strong>Recommendation(s): </strong>Data sent to web application should be escaped before saving them to the database. Proper escaping will help to remove all the special characters such as &lt; &gt; / @ # $ and tags such as <code>&lt;script&gt;</code> <code>&lt;iframe&gt;</code>. Escaping in ExpressJS can be done through 
+<code> escape(req.body.data); </code> </li>
+</ul></li>
+
+
+<li><p><strong>No sanitization of input</strong></p>
+
+<ul>
+<li><strong>Issue: </strong> the web application allows any type of result to come through and become a garbage document inside the mongo database </li>
+
+<li><strong>Location: </strong>POST API</li>
+
+<li><strong>Severity of issue: </strong> <span class="high">High</span>, this issue will affect the data storage inside the database. A clever attacker can easily swamp the entire database with undefined data and bring the site down once the database storage limit is exhausted (5MB for this assignment's MONGOLAB account).</li> 
+
+<li><strong>Description: </strong> Data submitted through the POST API is not checked for legitimate submission. Legitimate submissions are those with username as a string, score of the user's 2048 game with the grid object sent in as JSON. However, the web application will accept any type of data, with fewer fields or more fields than required in the legitimate submission. This allows sending "bad" scores without any validation of real grid. For example, from the mac command shell, use curl:
+<code> curl --data "" http://thawing-dawn-4700.herokuapp.com/submit.json </code> This will insert in the database a null document which occupies some spaces but is totally useless and may also introduces inefficiency in database management.
+<table class="pictures">
+<tr><td><img src="images/Issue 2_command line.png" alt="command line" title="No sanitization of input curl command" /></td>
+<td><img src="images/Issue 2_proof.png" alt="result" title="No sanitization of input result" /></td></tr></table>
+<code> curl --data "username=tam&amp;score=9999999" http://thawing-dawn-4700.herokuapp.com/submit.json </code>
+This will insert an unverified username and score into the scoreboard. As seen from the pictures below, user Tam does not play the game but his score is still very high and is one of the leaders in the scoreboard.
+<table class="pictures">
+<tr><td><img src="images/Issue 2_command line_1.png" alt="command line" title="No sanitization of input curl command 1" /></td>
+<td><img src="images/Issue 2_proof_1.png" alt="result" title="No sanitization of input result 1" /></td></tr></table></li>
+
+<li><strong>Recommendation(s): </strong>Every time some data is submitted through POST, the web application needs to check if any of the entries are missing, i.e., any of the entries is undefined. Alternatively, app developer can try to re-create the grid to verify if the grid sent in is valid. If it is impossible to re-create the grid, it means that the game score sent in is invalid too. </li>
+</ul></li>
+
+
+<li><p><strong>Cross Origin Resource Sharing</strong></p>
+
+<ul>
+<li><strong>Issue: </strong> Allow any origin to send in and retrieve data from the server </li>
+
+<li><strong>Location: </strong>in the POST and GET API</li>
+
+<li><strong>Severity of issue: </strong> <span class="medium">Medium</span>, this allows any domains to send and receive data from the web application.</li> 
+
+<li><strong>Description: </strong> In the POST and GET API of the web application, Cross Origin Resource Sharing is allowed for all domains.
+This will allow every website to perform XMLHttpRequest to the web application, creating more vulnerability for attacker to assess private content on the site due to increasing allowed interactions.
+<table class="pictures">
+<tr><td><img src="images/Issue 3_proof_1.png" alt="issue 3 proof" title="Cross Origin Resource Sharing proof" /></td></tr></table></li>
+
+<li><strong>Recommendation(s): </strong>Should not use <code> "*" </code> wildcard in <code> Access-Control-Allow-Origin: "*" </code>. Maintain a whitelist of acceptable origins and pass them in the Access-Control header instead. Another alternate solution is to tie a user session id to a particular origin, so that if a different origin requests the web application with user credentials, it often fails. For example, when logging into Facebook in a unfamiliar machine or origin, Facebook will send a notification email to the user. </li>
+</ul></li>
+
+<li><strong>Codes comment: </strong>
+<ul> 
+<li>These are not security issues but just some comments from the codes of my partner's.</li>
+<li>In POST API, Gilad allows the user to send in the timestamp "created_at" as one of the user inputs. However, this need not be sent in by the user but can be created from the web application. Hence, for his web application, sometimes the timestamp does not correcly render.
+<table class="pictures">
+<tr><td><img src="images/Code comment_2.png" alt="issue 3 proof" title="Cross Origin Resource Sharing proof" /></td></tr></table></li>
+<li>In GET API "/scores.json", Gilad checks whether the user query "name" exits. If "name" exists, the web application will respond with scores and timestamp associated with that user name. However, even when the "name" does not exist, the web application still responds with the whole database. This is uneccessary and may expose information not requested for.
+<table class="pictures">
+<tr><td><img src="images/Code comment_1.png" alt="issue 3 proof" title="Cross Origin Resource Sharing proof" /></td></tr></table>
+</li></ul>
+</li></ol>
+
+<h2>Conclusion</h2>
+
+<p>Based on the codes, there is very little chance of database attack (exploiting <code>eval()</code> or <code>$where</code> to wipe out the database or drop a collection). Hence, most of security issues here pertain to the fact that user inputs are hardly checked and properly sanitized. The recommendations here will reduce the chance of the website being exploited but do not eliminate all the risks. Through this assignment I learnt the importance of security concerns in constructing a web application with database storage. Although the level is elementary but this is a good lesson for an overview of web security issues today and also an invite to explore better solutions in the future.</p>
+</body>
+</html>

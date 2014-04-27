@@ -1,0 +1,53 @@
+Introduction:
+This security assessment tests the vulnerability of the ScoreCenter web application developed by <a href="http://jgx.github.io/">Jonathan Gilad</a> for Comp20 Assignment 4. Jonathan’s ScoreCenter allows users to keep track of their scores and grid every time they play the game 2048. This is achieved by providing an API (through the web application) for users to send in their game’s information (score, grid and timestamp) and retrieve them on the website through the simple user interface. This web user interface allows any user to see the entire database or to see game information of a specific user through a simple username request. Although this web application is functional, it contains a lot of security issues that make it unsuitable for public use. This assessment will identify and analyze the security issues, as well as suggest some solutions for them.
+
+Methodology:
+At first, assessment was “black-box” testing. I tried to use curl and simple tools like Tamper Data on Firefox to find out my partner’s site vulnerabilities. After that, I met up with my partner and we exchanged our codes. I then reviewed through the code by running it in localhost to find more logic errors, bad programming practices and also vulnerabilities that can potentially be exploited.
+
+Abstracts of findings:
+The majority of the issues found within this security assessment pertains to the ability of the web application to filter out the bad inputs. Also, there is currently no limit of the input that the web application takes in. My analysis will hence be mostly focusing the input filtering with some coding glitches. 
+
+Issues found and technical analysis:
+1. Cross-Site Scripting:
+Issue: user can manually inject <script> element into the database, which will displayed erroneous results on the web page when loaded.
+Location: <script> is passed in through the POST API.
+Severity of issue: High, this makes the site vulnerable to an array of JavaScript codes, which can alter the site appearance and render the site unusable by users.
+
+Description: Data submitted is not properly checked so that it can contain JavaScript codes that can affect the web site directly. For example, from the Mac shell command, running:
+curl --data "username=<iframe width="560" height="315" src="//www.youtube.com/embed/E2LM3ZlcDnkder="0" allowfullscreen></iframe>" http://thawing-dawn-4700.herokuapp.com/submit.json
+will embed a youtube video inside the web site when loaded.
+
+Recommendation(s): Data sent to web application should be escaped before saving them to the database. Proper escaping will help to remove all the special characters such as < > / @ # $ and tags such as <script> <iframe>. Escaping in ExpressJS can be done through 
+escape(req.body.data);
+
+2. No sanitization of input
+Issue: the web application allows any type of result to come through and become a garbage document inside the mongo database
+Location: POST API
+Severity: High, this issue will affect the data storage inside the database. A clever attack can easily swamp the entire database with undefined data and bring the site down once the database storage limit is exhausted (5MB for this assignment’s MONGOLAB account).
+Description: Data submitted through the POST API is not checked for legitimate submission. Legitimate submissions are those with username as a string, score of the user’s 2048 game with the grid object sent in as JSON. However, the web application will accept any type of data, with fewer fields or more fields than required in the legitimate submission. This allows sending “bad” scores without any validation of real grid. For example, from the mac command shell, use curl:
+curl --data "” http://thawing-dawn-4700.herokuapp.com/submit.json
+This is insert the database with a null document which occupies some spaces but is totally useless and may also introduces inefficiency in database management.
+curl --data “username=tam&score=999999” http://thawing-dawn-4700.herokuapp.com/submit.json
+This will insert an unverified username and score into the scoreboard. User Tam does not play the game but his score is still very high and is one of the leaders in the scoreboard.
+ 
+Recommendation(s):
+Every time some data is submitted through POST, the web application needs to check if any of the entries are missing, i.e., any of the entries is undefined. Alternatively, app developer can try to re-create the grid to verify if the grid sent in is valid. If it is impossible to re-create the grid, it means that the game score sent in is invalid too.
+
+3. Cross Origin Resource Sharing:
+Issue: Allow any origin to send in and retrieve data from the server
+Location: in the POST and GET API
+Severity: Medium, this allows any domains to send and receive data from the web application.
+Description: In the POST and GET API of the web application, Cross Origin Resource Sharing is allowed for all domains.
+This will allow every website to perform XMLHttpRequest to the web application, creating more vulnerability for attacker to assess private content on the site due to increasing allowed interactions.
+Recommendation(s):
+Should not use “*” wildcard in Access-Control-Allow-Origin: *. Maintain a whitelist of acceptable origins and pass in the Access-Control header instead. Another alternate solution is to tie a user session id to a particular origin, so that if a different origin requests the web application with user credentials, it often fails. For example, when logging into Facebook in a unfamiliar machine or origin, Facebook will send a notification email to the user.
+
+
+Codes comment:
+These are not security issues but just some comments from the codes of my partner's.
+In POST API, Gilad allows the user to send in the timestamp "created_at" as one of the user inputs. However, this need not be sent in by the user but can be created from the web application. Hence, for his web application, sometimes the timestamp does not correcly render.
+In GET API "/scores.json", Gilad checks whether the user query "name" exits. If "name" exists, the web application will respond with scores and timestamp associated with that user name. However, even when the "name" does not exist, the web application still responds with the whole database. This is uneccessary and may expose information not requested for.
+
+Conclusion:
+Based on the codes, there is very little chance of database attack (using eval() or $where to wipe out the database or drop a collection). Hence, most of security issues here pertain to the fact that user inputs are hardly checked and properly sanitized. The recommendations here will reduce the chance of the website being exploited but do not eliminate all the risks. Through this assignment I learnt the importance of security concerns in constructing a web application with database storage. Although the level is elementary but this is a good lesson for an overview of security issues today and also an invite to explore better solutions in the future.
+
